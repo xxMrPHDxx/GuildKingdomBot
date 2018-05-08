@@ -22,15 +22,9 @@ client.on("guildDelete", guild => {
 
 client.on("guildMemberAdd", member => {
   	const guild = member.guild;
+  	const user = member.user;
 
-  	if (!newUsers[guild.id]) newUsers[guild.id] = new Discord.Collection();
-  	newUsers[guild.id].set(member.id, member.user);
-
-  // if (newUsers[guild.id].size > 10) {
-    const userlist = newUsers[guild.id].map(u => u.toString()).join(" ");
     guild.channels.find("name", "general").send(`Welcome ${userlist} to the server!\nPlease type '/rules' to see the Guild rules.`);
-    newUsers[guild.id].clear();
-  // }
 });
 
 client.on("guildMemberRemove", member => {
@@ -60,6 +54,10 @@ client.on("message", async message => {
 		message.delete().catch(O_o=>{}); 
 		message.channel.send(sayMessage);
 	}
+
+	if(command === "clear") {
+		clearMessages(message.channel);
+	}
  
 	if(command === "kick") {
 		if(!message.member.roles.some(r=>["Administrator", "Moderator"].includes(r.name)) )
@@ -80,8 +78,6 @@ client.on("message", async message => {
 	 }
  
 	if(command === "ban") {
-		// Most of this command is identical to kick, except that here we'll only let admins do it.
-		// In the real world mods could ban too, but this is just an example, right? ;)
 		if(!message.member.roles.some(r=>["Administrator"].includes(r.name)) )
 			return message.reply("Sorry, you don't have permissions to use this!");
 		 
@@ -112,3 +108,13 @@ client.on("message", async message => {
 });
 
 client.login(config.token);
+
+function clearMessages(channel){
+	channel.fetchMessages({ limit: 100 })
+  	.then(messages => {
+  		console.log(`Received ${messages.size} messages`);
+  		messages.every(m => m.delete());
+  		clearMessages(channel);
+  	})
+  	.catch(console.error);
+}
