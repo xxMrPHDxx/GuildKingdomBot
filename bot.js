@@ -21,6 +21,11 @@ client.on("guildDelete", guild => {
 
 client.on("message", async message => {
  	if(message.author.bot) return;
+
+ 	if(message.content.match(/just joined the server./g)){
+ 		console.log("Somebody entered the server!");
+ 		message.reply(`Welcome ${message.author} to the server!\nPlease type '/rules' to see the Guild rules.`);
+ 	}
  
  	if(message.content.indexOf(config.prefix) !== 0) return;
 
