@@ -1,6 +1,8 @@
 const Discord = require("discord.js");
 const config = require("./config.json");
 
+const newUsers = new Discord.Collection();
+
 const client = new Discord.Client();
 
 client.on("ready", () => {
@@ -18,14 +20,30 @@ client.on("guildDelete", guild => {
  	client.user.setActivity(`Serving ${client.guilds.size} servers`);
 });
 
+client.on("guildMemberAdd", member => {
+  	const guild = member.guild;
+
+  	if (!newUsers[guild.id]) newUsers[guild.id] = new Discord.Collection();
+  	newUsers[guild.id].set(member.id, member.user);
+
+  // if (newUsers[guild.id].size > 10) {
+    const userlist = newUsers[guild.id].map(u => u.toString()).join(" ");
+    guild.channels.find("name", "general").send(`Welcome ${userlist} to the server!\nPlease type '/rules' to see the Guild rules.`);
+    newUsers[guild.id].clear();
+  // }
+});
+
+client.on("guildMemberRemove", member => {
+  	const guild = member.guild;
+
+  	if(!newUsers[guild.id]) return;
+
+  	if (newUsers[guild.id].has(member.id)) newUsers.delete(member.id);
+});
+
 
 client.on("message", async message => {
  	if(message.author.bot) return;
-
- 	if(message.content.match(/just joined the server./g)){
- 		console.log("Somebody entered the server!");
- 		message.reply(`Welcome ${message.author} to the server!\nPlease type '/rules' to see the Guild rules.`);
- 	}
  
  	if(message.content.indexOf(config.prefix) !== 0) return;
 
