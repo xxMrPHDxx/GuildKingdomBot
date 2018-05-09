@@ -63,7 +63,7 @@ client.on("message", async message => {
 	}
 
 	if(command === "spam") {
-		notifyEvery(message,"Noob @vxzell",0.000001);
+		notifyEvery(message,"Noob @vxzell",1/60);
 	}
 
 	if(command === "clear") {
