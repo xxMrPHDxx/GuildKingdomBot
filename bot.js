@@ -8,6 +8,7 @@ const client = new Discord.Client();
 client.on("ready", () => {
  	console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`); 
  	client.user.setActivity(`Serving ${client.guilds.size} servers`);
+ 	run();
 });
 
 client.on("guildCreate", guild => {
@@ -134,9 +135,8 @@ function clearMessages(channel){
 
 function run(){
 	console.log("running");
-	setTimeout(run,5000);
+	setTimeout(run,5 * 60000);
 }
-run();
 
 function notifyEvery(message,newMessage,minute){
 	function notify(){
