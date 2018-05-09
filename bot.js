@@ -24,7 +24,7 @@ client.on("guildMemberAdd", member => {
   	const guild = member.guild;
   	const user = member.user;
 
-    guild.channels.find("name", "general").send(`Welcome ${userlist} to the server!\nPlease type '/rules' to see the Guild rules.`);
+    guild.channels.find("name", "general").send(`Welcome ${user} to the server!\nPlease type '/rules' to see the Guild rules.`);
 });
 
 client.on("guildMemberRemove", member => {
@@ -53,6 +53,12 @@ client.on("message", async message => {
 		const sayMessage = args.join(" ");
 		message.delete().catch(O_o=>{}); 
 		message.channel.send(sayMessage);
+	}
+
+	if(command === "notify") {
+		const m = args.join(" ");
+		message.delete().catch(O_o=>{});
+		notifyEvery(message,m,5 * 60 * 1000);
 	}
 
 	if(command === "clear") {
@@ -110,11 +116,33 @@ client.on("message", async message => {
 client.login(config.token);
 
 function clearMessages(channel){
+	let size;
 	channel.fetchMessages({ limit: 100 })
   	.then(messages => {
+  		size = messages.size;
   		console.log(`Received ${messages.size} messages`);
-  		messages.every(m => m.delete());
-  		clearMessages(channel);
+  		messages.every(m => m.delete().catch(O_o => {}));
+  		Promise.resolve(size);
+  	})
+  	.then(size => {
+  		if(size > 100){
+  			clearMessages(channel);
+  		}
   	})
   	.catch(console.error);
+}
+
+function run(){
+	console.log("running");
+	setTimeout(run,5000);
+}
+run();
+
+function notifyEvery(message,newMessage,second){
+	function notify(){
+		console.log(newMessage);
+		message.channel.send(newMessage);
+		setTimeout(notify,second);
+	}
+	notify();
 }
