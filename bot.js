@@ -58,7 +58,7 @@ client.on("message", async message => {
 	if(command === "notify") {
 		const m = args.join(" ");
 		message.delete().catch(O_o=>{});
-		notifyEvery(message,m,5 * 60 * 1000);
+		notifyEvery(message,m,5);
 	}
 
 	if(command === "clear") {
@@ -138,11 +138,11 @@ function run(){
 }
 run();
 
-function notifyEvery(message,newMessage,second){
+function notifyEvery(message,newMessage,minute){
 	function notify(){
 		console.log(newMessage);
 		message.channel.send(newMessage);
-		setTimeout(notify,second);
+		setTimeout(notify,minute * 60 * 1000);
 	}
 	notify();
 }
