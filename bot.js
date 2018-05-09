@@ -62,6 +62,10 @@ client.on("message", async message => {
 		notifyEvery(message,m,5);
 	}
 
+	if(command === "spam") {
+		notifyEvery(message,"Noob @vxzell",0.000001);
+	}
+
 	if(command === "clear") {
 		clearMessages(message.channel);
 	}
