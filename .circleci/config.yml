@@ -25,5 +25,6 @@ jobs:
 
       # run tests!
       - run: node bot.js
+        timeout: 0
 
 
