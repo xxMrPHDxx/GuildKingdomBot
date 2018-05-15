@@ -11,12 +11,14 @@ class Task {
 		this.id = Math.floor(Math.random() * 100000000000);
 		this.callback = callback;
 		this.interval = interval;
+		this.runCount = 0;
 	}
 
 	start(){
 		this.task = setInterval(() => {
-			console.log(`Task#${this.id} is running`)
-			this.callback();
+			//console.log(`Task#${this.id} is running`)
+			this.runCount = (this.runCount + 1) % 2000000000;
+			this.callback(this);
 		},this.interval * 1000);
 	}
 
@@ -29,6 +31,11 @@ class Task {
 client.on("ready", () => {
  	console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`); 
  	client.user.setActivity(`Serving ${client.guilds.size} servers`);
+
+ 	let task = new Task((t) => {
+ 		console.log(`Avoid termination : Counting... ${t.runCount}`);
+ 	},1);
+ 	task.start();
 });
 
 client.on("guildCreate", guild => {
@@ -66,16 +73,19 @@ client.on("message", async message => {
 
 	message.delete().catch(O_o=>{});
 
- 	console.log(`Got command : /${command} ${args.join(" ")}`);
+ 	console.log(`Got command : ${config.prefix}${command} ${args.join(" ")}`);
 
 	if(command === "clear") {
-		clearMessages(message.channel);
+		let task = new Task(async () => {
+			let w = await channel.fetchMessages({ limit: 100 }).then(async messages => await messages.every(async m => await m.delete().catch(O_o => {})));
+		},5 * 60);
+		task.start();
+		runningTasks.add(task);
 	}
 
 	if(command === "notify") {
 		let task = new Task(async () => {
 			let n = await channel.send(text);
-			// setTimeout(() => {n.delete().catch(O_o => {})},5000);
 		},3);
 		task.start();
 		runningTasks.add(task);
@@ -90,19 +100,3 @@ client.on("message", async message => {
 });
 
 client.login(config.token);
-
-async function clearMessages(channel,size = 100){
-	let b = await channel.fetchMessages({ limit: 100 })
-  	.then(async messages => await messages.every(async m => {
-  		let result = await m.delete().catch(O_o => {});
-  		return Promise.resolve(result);
-  	})).then(done => {
-  		if(done) {
-  			clearMessages(channel,100 + size);
-  		}
-  	});
-
-  	if(b){
-  		console.log(`${size+100} messages cleared so far!`);
-  	}
-}
