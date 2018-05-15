@@ -98,24 +98,4 @@ client.on("message", async message => {
 	}
 });
 
-<<<<<<< HEAD
 client.login(config.token);
-=======
-client.login(config.token);
-
-async function clearMessages(channel,size = 100){
-	let b = await channel.fetchMessages({ limit: 100 })
-  	.then(async messages => await messages.every(async m => {
-  		let result = await m.delete().catch(O_o => {});
-  		return Promise.resolve(result);
-  	})).then(done => {
-  		if(done) {
-  			clearMessages(channel,100 + size);
-  		}
-  	});
-
-  	if(b){
-  		console.log(`${size+100} messages cleared so far!`);
-  	}
-}
->>>>>>> c821fc2afe87959879673d7084430b37b71e3517
